@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="layout/layoutA :: head"></head>
+<body> 
+	<header th:replace="layout/layoutA :: header"></header>
+    <h1 th:text="${titulo}"></h1>
+    <div class="container">
+		<div>
+			<a  sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-danger" th:href="@{/factura/form/} + ${usuario.id}"> Agregar Factura </a>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<img th:if="${#strings.length(usuario.foto) > 0}" class=""
+				 th:src="@{/uploads/} + ${usuario.foto}" 
+				 th:alt="${usuario.foto}" />
+			</div>
+			<div class="col-md-6">
+				<span  th:text="${usuario.id}"></span>
+				<span th:text="${usuario.nombre}"></span>
+				<span th:text="${usuario.apellido}"></span>
+				<span th:text="${usuario.email}"></span>
+				<span th:text="${usuario.createAt}"></span>
+			</div>
+		</div>
+		<h1>Facturas</h1>
+		<div th:if="${#lists.isEmpty(usuario.facturas)}" class="alert alert-info"> No tienes facturas </div>
+		<table th:if="${not #lists.isEmpty(usuario.facturas)}" class="table">
+			<thead>
+				<tr>
+					<th>folio</th>
+					<th>descripcion</th>
+					<th>fecha</th>
+					<th>total</th>
+					<th sec:authorize="hasRole('ROLE_USER')">ver</th>
+					<th sec:authorize="hasRole('ROLE_ADMIN')">eliminar</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="factura : ${usuario.facturas}">
+					<td th:text="${factura.id}"></td>
+					<td th:text="${factura.descripcion}"></td>
+					<td th:text="${factura.observacion}"></td>
+					<td th:text="${factura.total}"></td>
+					<td sec:authorize="hasRole('ROLE_USER')"><a th:href="@{'/factura/ver/' + ${factura.id}}">Ver detalle</a></td>
+					<td sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{'/factura/eliminar/' + ${factura.id}}" onclick="return confirm('Estas seguro que deseas eliminar la factura')">Eliminar</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	
+	<footer th:replace="layout/layoutA :: footer"></footer>
+</body>
+</html>

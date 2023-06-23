@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/layoutA :: head"></head>
+<body> 
+	<header th:replace="layout/layoutA :: header"></header>
+    <h1 th:text="${titulo}"></h1>
+    <div th:object="${cliente}" >
+		<ul th:if="${#fields.hasErrors('*')}">
+			<li th:each="error : ${#fields.errors('*')}" th:text="${error}"></li>
+		</ul>
+	</div>
+	<br>
+    <form th:action="@{/usuario/form}" th:object="${cliente}"  method="POST" enctype="multipart/form-data">
+		<label>Nombre</label>
+		<input type="text" th:field="*{nombre}" />
+		<small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"> </small>
+		<label>Apellido</label>
+		<input type="text" th:field="*{apellido}"  />
+		<small th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></small>
+		<label>Email</label>
+		<input type="email" th:field="*{email}" />
+		<small th:if="#{fields.hasErrors('email')}" th:errors="*{email}"></small>
+		<label>Fecha</label>
+		<input type="text" th:field="*{createAt}">
+		<small th:if="${#fields.hasErrors('createAt')}" th:errors="*{createAt}"></small>
+		<span>File</span>
+		<input type="file" name="file">
+		
+		<input type="submit" value="Enviar" /> 
+	</form>
+	
+	<footer th:replace="layout/layoutA :: footer"></footer>
+</body>
+</html>

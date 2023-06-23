@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="layout/layoutA :: head"></head>
+<body> 
+	<header th:replace="layout/layoutA :: header"></header>
+    <h1 th:text="${titulo}"></h1>
+    <h2 sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/usuario/form}">Agrega Un nuevo Registro </a></h2>
+    <table>
+		<thead>
+			<tr>
+				<th sec:authorize="hasRole('ROLE_USER')" >id</th>
+				<th>nombre</th>
+				<th>apellido</th>
+				<th>emal</th>
+				<th>fecha</th>h>
+				<th sec:authorize="hasRole('ROLE_ADMIN')">editar</th>
+				<th sec:authorize="hasRole('ROLE_ADMIN')">agregar Factura</th>
+				<th sec:authorize="hasRole('ROLE_ADMIN')">Eliminar</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="cliente : ${usuarios}">
+				<td sec:authorize="hasRole('ROLE_USER')" ><a th:href="@{/usuario/ver/} + ${cliente.id}" th:text="${cliente.id}"></a> </td>
+				<td th:text="${cliente.nombre}"></td>
+				<td th:text="${cliente.apellido}"></td>
+				<td th:text="${cliente.email}"></td>
+				<td th:text="${cliente.createAt}"></td>
+				<td sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/usuario/form/} + ${cliente.id}">Editar</a></td>
+				<td sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/factura/form/} + ${cliente.id} ">Agregar Factura</a></td>
+				<td sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/usuario/eliminar/} + ${cliente.id}">Eliminar</a></td>
+			</tr>
+		</tbody>
+	</table>
+	<nav th:replace="paginator :: paginatorA"></nav>
+	<footer th:replace="layout/layoutA :: footer"></footer>
+	
+</body>
+</html>

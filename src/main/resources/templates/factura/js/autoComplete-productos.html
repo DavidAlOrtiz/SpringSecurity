@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/layoutA :: head"></head>
+<body> 
+	<script type="text/javascript" th:fragment="javascript">
+		$(document).ready(function(){
+			
+			$("#buscar_producto").autocomplete({
+				source : function(request, response){
+					$.ajax({
+						url: "/factura/cargar-orden/" + request.term,
+						dataType: "json",
+						data:{
+							term: request.term
+						},
+						success: function(data){
+							response($.map(data, function(item){
+								console.log(item)
+								return{
+									labe: item.id,
+									value : item.nombre,
+									precio : item.precio
+								}
+							}))
+						},
+					});
+				
+				},
+				select: function(event, ui){
+					//$("#buscar_producto").val(ui.item.label);
+					if(itemHelper.hasItem(ui.item.labe)){
+						itemHelper.incrementaCantidad(ui.item.labe, ui.item.precio);
+						return false;
+					}
+					var linea = $("#plantillaItemsFactura").html();
+					linea = linea.replace(/{ID}/g, ui.item.labe)
+					console.log(ui.item.labe)
+					linea = linea.replace(/{NOMBRE}/g, ui.item.value)
+					console.log(ui.item.value)
+					linea = linea.replace(/{PRECIO}/g, ui.item.precio)
+					console.log(ui.item.precio)
+					$("#cargarIdItemProducto tbody").append(linea)
+					itemHelper.calcularImporte(ui.item.value, ui.item.precio, 1 )				
+				    return false;
+				}
+			}),
+			$("form").submit(function(){
+				$("#plantillaItemsFactura").remove();
+				return;
+			})
+		});
+		
+		var itemHelper= {
+			calcularImporte : function(id, precio, cantidad){
+				$("#total_importe_"+id).html(parseInt(precio) * parseInt(cantidad))
+				this.calcularGranTotal();
+			},
+			hasItem: function(id){
+				var resultado = false;
+				$("input[name='items_id]'").each(function(){
+					console.log(parseInt(id) == parseInt($(this).val()) + "a")
+					if( id === $(this).val() ){
+						console.log("entro aqui")
+						resultado = true;
+					}
+				})
+				
+				$('input[name="items_id"]').each(function(){
+					console.log("Hola")
+				})
+				this.calcularGranTotal();
+			},
+			incrementaCantidad: function(id, precio){
+				var cantidad = $("#catidad_"+id).val()	? parseInt($("#catidad_"+id).val()) : 0;
+				$("#catidad_"+id).val(++cantidad)
+				this.calcularImporte(id, precio, cantidad)		
+			},
+			eliminar: function(id){
+				$("#row_"+id).remove();
+				this.calcularGranTotal();
+			},
+			calcularGranTotal : function(){
+				var total = 0;
+				debugger;
+				const resultadoId = $('span[id^="total_importe_"]');
+				for(i=0; i < resultadoId.length; i++){
+					total += parseInt($(this).html());
+				}
+				$('span[id^="total_importe_"]').each(function(){
+					console.log("Hola mundo");
+					total += parseInt($(this).html());
+				});
+				$("#gran_total").html(total);
+			}
+		}
+	</script>
+</body>
+</html>

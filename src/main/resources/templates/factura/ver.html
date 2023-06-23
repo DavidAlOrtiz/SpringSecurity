@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/layoutA :: head"></head>
+<body> 
+	<header th:replace="layout/layoutA :: header"></header>
+    <h1 th:text="${titulo}"></h1>
+    
+    
+   <div>
+	   <div class="card">
+		   	<div class="card-body">
+				<ul>
+					<li>Datos del cliente</li>
+					<li th:text="${factura.client}"></li>
+					<li th:text="${factura.client.email}"></li>
+				</ul>
+				<ul>
+					<li>Datos de la factura</li>
+					<li th:text="${factura.id}"></li>
+					<li th:text="${factura.descripcion}"></li>
+					<li th:text="${factura.createAt}"></li>
+				</ul>	   
+			</div>
+			<table>
+				<thead>
+					<tr>
+						<th>Producto</th>
+						<th>Precio</th>
+						<th>Cantidad</th>
+						<th>Total</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="linea : ${factura.itemsFactura}">
+						<th th:text="${linea.producto.nombre}"></th>
+						<th th:text="${linea.producto.precio}"></th>
+						<th th:text="${linea.cantidad}"></th>
+						<th th:text="${linea.calcularImporte()}"></th>
+					</tr>
+				</tbody>
+			</table>
+			<div>
+				<h5 >Gran Total <span  th:text="${total}"></span></h5>
+			</div>
+			
+			<div>
+				<div>Observaciones</div>
+				<h4 th:text="${factura.observacion}" th:if="${not #strings.isEmpty(factura.observacion)}"> </h4>
+				<h4  th:if="${#strings.isEmpty(factura.observacion)}"> No tienes observaciones </h4>
+			</div>
+	   </div>
+   </div>
+	
+	<footer th:replace="layout/layoutA :: footer"></footer>
+	 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+	<script th:replace="factura/js/autoComplete-productos :: javascript"></script>
+</body>
+</html>

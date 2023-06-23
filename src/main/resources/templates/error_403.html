@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layout/layoutA :: head"></head>
+
+<body>
+	<header th:replace="layout/layoutA :: header"></header>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<div class="card bg-danger  text-white">
+					<div class="card-body">
+						<div class="">
+							Acceso denegado no tienes permiso <span th:text="${#authentication.name}"></span>
+						</div>
+					</div>
+					<div class="card-footer">
+						<a th:href="@{/usuario/}" class="btn btn-outline-dark"> regresar</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer th:replace="layout/layoutA :: footer"></footer>
+</body>
+
+</html>
