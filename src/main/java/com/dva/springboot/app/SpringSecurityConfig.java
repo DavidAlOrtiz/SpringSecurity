@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
@@ -11,9 +12,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration
-public class SpringSecurityConfig  {
+import com.dva.springboot.app.auth.handlesSucces.LoginHandleSucces;
 
+@Configuration
+//@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
+public class SpringSecurityConfig  {
+	
+	@Autowired
+	private LoginHandleSucces loginHandle; 
 //	@Bean
 //	private static BCryptPasswordEncoder passwordEncoder() {
 //		return new BCryptPasswordEncoder();
@@ -42,11 +49,12 @@ public class SpringSecurityConfig  {
          http.authorizeRequests().requestMatchers("/", "/css/**", "/js/**", "/images/**", "/usuario/", "/loginA").permitAll()
                  .requestMatchers("/usuario/ver/**").hasAnyRole("USER")
                  .requestMatchers("/uploads/**").hasAnyRole("USER")
-                 .requestMatchers("/usuario/form/**").hasAnyRole("ADMIN")
-                 .requestMatchers("/usuario/eliminar/**").hasAnyRole("ADMIN")
+                 //.requestMatchers("/usuario/form/**").hasAnyRole("ADMIN")
+                 //.requestMatchers("/usuario/eliminar/**").hasAnyRole("ADMIN")
                  .requestMatchers("/factura/**").hasAnyRole("ADMIN")
                  .and()
                  	.formLogin().loginPage("/login")
+                 	.successHandler(loginHandle)
                  	.permitAll()
                  .and()
                  .logout().permitAll()

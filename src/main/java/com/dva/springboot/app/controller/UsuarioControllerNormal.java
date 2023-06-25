@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.management.RuntimeErrorException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,6 +47,7 @@ import com.dva.springboot.app.controller.util.paginator.PageRender;
 import com.dva.springboot.app.models.entity.Cliente;
 import com.dva.springboot.app.service.IClienteService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 
@@ -45,7 +55,8 @@ import org.springframework.http.HttpHeaders;
 @RequestMapping("/usuario")
 @SessionAttributes("cliente")
 public class UsuarioControllerNormal {
-	private final Logger log = LoggerFactory.getLogger(getClass());
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
+	protected final Log logger = LogFactory.getLog(this.getClass());
 	@Autowired
 	IClienteService clienteService;
 	
@@ -87,10 +98,31 @@ public class UsuarioControllerNormal {
 		return "ver";
 	}
 	
+
 	@GetMapping({"/", "/listar"})
-	public String index(@RequestParam(name = "pageA", defaultValue = "0")  int page, Model model) {
+	public String index(@RequestParam(name = "pageA", defaultValue = "0")  int page, Model model,
+			Authentication authentication, HttpServletRequest request) {
 		Pageable pageRequest = PageRequest.of(page, 1);
 		Page<Cliente> clienteReq =  clienteService.getAll(pageRequest);
+		
+		Authentication aut = SecurityContextHolder.getContext().getAuthentication();
+		
+		if(authentication != null ) {
+			log.info("Inicio sesion " + authentication.getName());
+		}
+		
+		if(hasRole("ADMIN")) {
+			logger.info("Hola tienes acceso".concat(authentication.getName()).concat("Tienes Acceso") );
+		}else {
+			logger.info("No tienes acceso");
+		}
+		
+		SecurityContextHolderAwareRequestWrapper contextWrap = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
+		if(contextWrap.isUserInRole("ADMIN")) {
+			logger.info("Tienes Acceso desde el SegurityContextHolderHande");
+		}else {
+			logger.info("No tienes acceso");
+		}
 		
 		PageRender<Cliente> pageRender = new PageRender<>("/usuario/", clienteReq);
 		model.addAttribute("pageA", pageRender);
@@ -99,6 +131,7 @@ public class UsuarioControllerNormal {
 		return "listar";
 	}
 	
+	@Secured({"ROLE_ADMIN"})
 	@GetMapping("/form")
 	public String formulario(Map<String, Object> model) {
 		Cliente cliente = new Cliente();
@@ -166,6 +199,7 @@ public class UsuarioControllerNormal {
 		return "redirect:/usuario/";
 	}
 	
+	@Secured("ROLE_ADMIN")
 	@GetMapping("/eliminar/{id}")
 	public String eliminar(@PathVariable Long id, RedirectAttributes flash) {
 		if(id > 0 && id != null) {
@@ -185,4 +219,54 @@ public class UsuarioControllerNormal {
 		}
 		return "redirect:/usuario/";
 	}
+	
+	private boolean hasRole(String role) {
+		
+		SecurityContext securityContext = SecurityContextHolder.getContext();
+		if( securityContext == null ) {
+			return false;
+		}
+		
+		Authentication auth = securityContext.getAuthentication();
+		
+		if(auth == null) {
+			return false;
+		}
+		
+		Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+		
+		for(GrantedAuthority authoritiesA : authorities ) {
+			if(role.equals(authoritiesA.getAuthority())) {
+				logger.info("Hola usuario tu rol es");
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+//	private boolean hasRole(String role) {
+//		SecurityContext sec = SecurityContextHolder.getContext();
+//		
+//		if(sec == null ) {
+//			return false;
+//		}
+//		
+//		Authentication aut = sec.getAuthentication();
+//		
+//		if(aut == null) {
+//			return false;
+//		}
+//		
+//		Collection<? extends GrantedAuthority> authoris = aut.getAuthorities();
+//		
+//		for(GrantedAuthority autA : authoris) {
+//			if(role.equals(autA.getAuthority())) {
+//				return true;
+//			}
+//		}
+//		
+//		return false;
+//		
+//	}
 }
