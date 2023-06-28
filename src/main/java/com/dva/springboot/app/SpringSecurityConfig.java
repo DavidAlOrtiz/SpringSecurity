@@ -1,5 +1,7 @@
 package com.dva.springboot.app;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,6 +24,16 @@ public class SpringSecurityConfig  {
 	
 	@Autowired
 	private LoginHandleSucces loginHandle; 
+	
+	@Autowired
+	private BCryptPasswordEncoder  passwordEncoderC;
+	
+	@Autowired
+	private DataSource dataSource;
+	
+	@Autowired
+	private UserDetailsService usuerDetail;
+	
 //	@Bean
 //	private static BCryptPasswordEncoder passwordEncoder() {
 //		return new BCryptPasswordEncoder();
@@ -70,21 +83,26 @@ public class SpringSecurityConfig  {
 	 
 	 
 
-		@Bean
-		public static  BCryptPasswordEncoder bcRyptPasswordEncoder() {
-			return new BCryptPasswordEncoder();
-		}
+		
 		
 		@Autowired
 		public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
 			
-			PasswordEncoder passwordEncoder = bcRyptPasswordEncoder();
-			UserBuilder users = User.builder().passwordEncoder(passwordEncoder::encode);
+//			PasswordEncoder passwordEncoder = passwordEncoderC;
+//			UserBuilder users = User.builder().passwordEncoder(passwordEncoder::encode);
+//			
+//			builder.inMemoryAuthentication()
+//			.withUser(users.username("admin").password("12345").roles("ADMIN", "USER"))
+//			.withUser(users.username("juan").password("juan").roles("USER"));
 			
-			builder.inMemoryAuthentication()
-			.withUser(users.username("admin").password("12345").roles("ADMIN", "USER"))
-			.withUser(users.username("juan").password("juan").roles("USER"));
+//			builder.jdbcAuthentication()
+//			.dataSource(dataSource)
+//			.usersByUsernameQuery("select username, password, enabled from users where username=?")
+//			.authoritiesByUsernameQuery("select u.username, a.authority from authorities a inner join users u"
+//					+ " on (a.user_id = u.id)  where u.username=? ");
 			
+			builder.userDetailsService(usuerDetail)
+			.passwordEncoder(passwordEncoderC);
 		}
 	 
 	 

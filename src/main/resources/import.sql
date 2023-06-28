@@ -22,3 +22,13 @@ SELECT * FROM productos
 INSERT INTO facturas(descripcion, observacion, cliente_id, creado_at) VALUES ('Compra en tiend', 'Compra en casa', 1, GETDATE());
 
 INSERT INTO items_factura (cantidad, producto_id) VALUES (3 , 2);
+
+
+---Agregnado role y usuarios
+
+INSERT INTO users(username, password, enabled) values('admin', '$2a$10$TWKstGI/3qdCRrQAi7JLneelXav6peoupg1pb5jNsNubCUom7KMXu', 1)
+INSERT INTO users(username, password, enabled) values('juan', '$2a$10$gxqYsLU0oOC32shNnHr1Ou2fDxv/R7wI9lvCGmoMK2G0UpqSpCb.K', 1)
+
+INSERT INTO authorities (authority, user_id) values('ROLE_ADMIN', 1)
+INSERT INTO authorities (authority, user_id) values('ROLE_USER', 1)
+INSERT INTO authorities (authority, user_id) values('ROLE_USER', 2)
