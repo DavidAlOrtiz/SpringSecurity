@@ -5,6 +5,9 @@
 	<header th:replace="layout/layoutA :: header"></header>
     <h1 th:text="${titulo}"></h1>
     
+    <div>
+		<a th:href="@{'/factura/ver/' + ${factura.id}(format=pdf)}" class="btn btn-danger">PDF</a>
+	</div>
     
    <div>
 	   <div class="card">

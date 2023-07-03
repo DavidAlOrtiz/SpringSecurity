@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -60,7 +62,8 @@ public class UsuarioControllerNormal {
 	@Autowired
 	IClienteService clienteService;
 	
-	
+	@Autowired
+	MessageSource mesaMessageSource;
 	
 	@GetMapping("/uploads/{filename:.+}")
 	public ResponseEntity<Resource> verFoto(@PathVariable String filename){
@@ -101,7 +104,7 @@ public class UsuarioControllerNormal {
 
 	@GetMapping({"/", "/listar"})
 	public String index(@RequestParam(name = "pageA", defaultValue = "0")  int page, Model model,
-			Authentication authentication, HttpServletRequest request) {
+			Authentication authentication, HttpServletRequest request, Locale locale) {
 		Pageable pageRequest = PageRequest.of(page, 1);
 		Page<Cliente> clienteReq =  clienteService.getAll(pageRequest);
 		
@@ -126,7 +129,7 @@ public class UsuarioControllerNormal {
 		
 		PageRender<Cliente> pageRender = new PageRender<>("/usuario/", clienteReq);
 		model.addAttribute("pageA", pageRender);
-		model.addAttribute("titulo", "Hola La lista esta aqui");
+		model.addAttribute("titulo", mesaMessageSource.getMessage("text.cliente.titulo", null, locale));
 		model.addAttribute("usuarios", clienteReq);
 		return "listar";
 	}
